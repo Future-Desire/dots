@@ -1,0 +1,76 @@
+#!/usr/bin/env sh
+
+border_width=4
+yabai -m config layout bsp
+yabai -m config window_border on
+yabai -m config top_padding $border_width
+yabai -m config bottom_padding $border_width
+yabai -m config left_padding $border_width
+yabai -m config right_padding $border_width
+yabai -m config window_gap $(($border_width / 2))
+
+yabai -m config active_window_border_color 0xffff10f0
+yabai -m config normal_window_border_color 0xff555555
+
+# New window spawns to the right if vertical split, or bottom if horizontal split
+yabai -m config window_placement second_child
+
+# Auto balance makes it so all windows always occupy the same space,
+# independent of how deeply nested they are in the window tree. When a new
+# window is inserted or a window is removed, the split ratios will be
+# automatically adjusted. If auto balance is disabled, the split ratio defines
+# how much space each window occupies after a new split is created. The float
+# signifies the percentage the old pane will retain.
+yabai -m config auto_balance off.
+yabai -m config split_ratio 0.50
+
+# set mouse interaction modifier key (default: fn)
+yabai -m config mouse_modifier ctrl
+
+# set modifier + left to move window and + right to resize window
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+
+# With focus follows mouse, you can also focus windows without having to click
+# on them. This can be set to either autofocus (window gets focused, but not
+# raised) or autoraise (window gets raised as if it was clicked on). Focus
+# follows mouse is disabled while holding the mouse modifier key so that you can
+# access the menu bar easily.
+# set focus follows mouse mode (default: off, options: off, autoraise, autofocus)
+yabai -m config focus_follows_mouse off
+# Mouse follows focus makes it so that when yabai focuses another window (e.g.
+# through a focus command), the mouse cursor gets moved to the center of the
+yabai -m config mouse_follows_focus off
+
+# floating windows are always on top (default: off)
+yabai -m config window_topmost on
+
+yabai -m config window_opacity off
+yabai -m config window_opacity_duration 0.00
+yabai -m config active_window_opacity 1.0
+yabai -m config window_shadow float
+
+# My custom space names for my 3 monitor setup. These names are used in some of my scripts.
+yabai -m space 1 --label one
+yabai -m space 2 --label two
+yabai -m space 3 --label three
+yabai -m space 4 --label four
+yabai -m space 5 --label five
+yabai -m space 6 --label six
+yabai -m space 9 --label nine
+
+# float system preferences. Most of these just diable Yabai form resizing them.
+yabai -m rule --add app="^System Preferences$" sticky=on layer=above manage=off
+yabai -m rule --add app="^System Settings$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Karabiner-Elements$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Karabiner-EventViewer$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Finder$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Raycast$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Disk Utility$" sticky=on layer=above manage=off
+yabai -m rule --add app="^System Information$" sticky=on layer=above manage=off
+yabai -m rule --add app="^Flux$" manage=off
+yabai -m rule --add app="^Stats$" manage=off
+
+echo "yabai configuration loaded.."
+
+#END
