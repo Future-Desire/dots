@@ -18,8 +18,8 @@ fi
 
 export HISTFILE=~/.cache/zsh/history
 export LESSHISTFILE=~/.cache/less/history
-export MYVIMRC='~/.config/vim/vimrc'
-export VIMINIT='source $MYVIMRC'
+# export MYVIMRC='~/.config/vim/vimrc'
+# export VIMINIT='source $MYVIMRC'
 
 # change prompt:
 PS1="%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[red]%}]%{$reset_color%}$%b "
@@ -53,56 +53,54 @@ source ~/.config/zsh/powerlevel10k/powerlevel10k.zsh-theme # powerlevel10k theme
 
 ### --------- Custom Commands --------- ###
 # prints a swatch of all 256 colors:
-colours()
-{
+colours(){
     for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done
 }
 
 # move a file to a new location, leaving behind a symolic link
-symmove()
-{
-  # 1. Grab the full path of the original file
-  # 2. move the src to dst
-  # 3. symlink dst (where the original file is now at) to the src (where the 
-  #    file was originally from)
-  src_full_path="$(realpath $1)" && mv -i $1 $2 && ln -s $2 $src_full_path 
+symmove(){
+    # 1. Grab the full path of the original file
+    # 2. move the src to dst
+    # 3. symlink dst (where the original file is now at) to the src (where the 
+    #    file was originally from)
+    src_full_path="$(realpath $1)" && mv -i $1 $2 && ln -s $2 $src_full_path 
 }
 
 
 # Remove python compiled byte-code and mypy/pytest cache in either the current
 # directory or in a list of specified directories (including sub directories).
 function pyclean() {
-  find "${@:-.}" -type f -name "*.py[co]" -delete
-  find "${@:-.}" -type d -name "__pycache__" -delete
-  find "${@:-.}" -depth -type d -name ".mypy_cache" -exec rm -r "{}" +
-  find "${@:-.}" -depth -type d -name ".pytest_cache" -exec rm -r "{}" +
+    find "${@:-.}" -type f -name "*.py[co]" -delete
+    find "${@:-.}" -type d -name "__pycache__" -delete
+    find "${@:-.}" -depth -type d -name ".mypy_cache" -exec rm -r "{}" +
+    find "${@:-.}" -depth -type d -name ".pytest_cache" -exec rm -r "{}" +
 }
 
 # Add the user installed site-packages paths to PYTHONPATH, only if the
 # directory exists. Also preserve the current PYTHONPATH value.
 # Feel free to autorun this when .zshrc loads.
 function pyuserpaths() {
-  setopt localoptions extendedglob
+    setopt localoptions extendedglob
 
-  # Check for a non-standard install directory.
-  local user_base="${PYTHONUSERBASE:-"${HOME}/.local"}"
+    # Check for a non-standard install directory.
+    local user_base="${PYTHONUSERBASE:-"${HOME}/.local"}"
 
-  local python version site_pkgs
-  for python in python2 python3; do
-    # Check if command exists
-    (( ${+commands[$python]} )) || continue
+    local python version site_pkgs
+    for python in python2 python3; do
+        # Check if command exists
+        (( ${+commands[$python]} )) || continue
 
-    # Get minor release version.
-    # The patch version is variable length, truncate it.
-    version=${(M)${"$($python -V 2>&1)":7}#[^.]##.[^.]##}
+        # Get minor release version.
+        # The patch version is variable length, truncate it.
+        version=${(M)${"$($python -V 2>&1)":7}#[^.]##.[^.]##}
 
-    # Add version specific path, if:
-    # - it exists in the filesystem
-    # - it isn't in $PYTHONPATH already.
-    site_pkgs="${user_base}/lib/python${version}/site-packages"
-    [[ -d "$site_pkgs" && ! "$PYTHONPATH" =~ (^|:)"$site_pkgs"(:|$) ]] || continue
-    export PYTHONPATH="${site_pkgs}${PYTHONPATH+":${PYTHONPATH}"}"
-  done
+        # Add version specific path, if:
+        # - it exists in the filesystem
+        # - it isn't in $PYTHONPATH already.
+        site_pkgs="${user_base}/lib/python${version}/site-packages"
+        [[ -d "$site_pkgs" && ! "$PYTHONPATH" =~ (^|:)"$site_pkgs"(:|$) ]] || continue
+        export PYTHONPATH="${site_pkgs}${PYTHONPATH+":${PYTHONPATH}"}"
+    done
 }
 
 # profile a python process using py-spy (e.g. process runs slowly, want to see where it's spending time)
@@ -114,9 +112,26 @@ pytop() {
     sudo /home/simon/miniconda3/bin/py-spy top -p $PYPID
 }
 
-brew-full-uninstall(){
-    brew uninstall $1
-    brew autoremove
+brew-full-uninstall() {
+    brew uninstall $1 && brew autoremove
+}
+
+is-hidden() {
+    if [[ "$(basename $1)" == .* ]]; then
+        return 1
+    fi
+    return 0
+}
+
+convert-pdf-md () {
+    # TODO: Analyse HTML to make sure markdown actually look good. 
+    # Uses pdftohtml from poppler for pdf -> html
+    # Then uses pandoc for htmp -> md
+    pdftohtml -s -stdout "${@}" | pandoc -f html -t markdown -o "${1%.pdf}".md ;
+}
+
+remove-extension() {
+    (is-hidden $1 && basename $1) || echo "no hidden files"
 }
 
 # Bluetooth restart on MacOS
@@ -153,6 +168,8 @@ alias code="codium"
 alias pathof="realpath"
 alias wget=wget --hsts-file="~/.local/share/wget-hsts"
 alias icat="kitty +kitten icat"
+alias search="firefox --search"
+alias vim='VIMINIT=.config/vim/vimrc vim'
 
 # Save typing for common commands:
 alias c="codium"
